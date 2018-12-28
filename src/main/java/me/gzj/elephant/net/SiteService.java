@@ -74,7 +74,13 @@ public class SiteService {
 
         try {
             Call<ResponseBody> call = sitePage.videoList(page);
-            Response<ResponseBody> response = call.execute();
+            Response<ResponseBody> response;
+            try {
+                response = call.execute();
+            } catch (Exception ex) {
+                // 异常时重试
+                response = call.clone().execute();
+            }
             if (!response.isSuccessful()) {
                 return ServiceResult.createFailResult();
             }
@@ -149,7 +155,13 @@ public class SiteService {
 
         try {
             Call<ResponseBody> call = sitePage.viewVideo(viewkey);
-            Response<ResponseBody> response = call.execute();
+            Response<ResponseBody> response;
+            try {
+                response = call.execute();
+            } catch (Exception ex) {
+                // 异常时重试
+                response = call.clone().execute();
+            }
             if (!response.isSuccessful()) {
                 return ServiceResult.createFailResult();
             }

@@ -9,6 +9,7 @@ import me.gzj.elephant.model.BaseVideo;
 import me.gzj.elephant.model.ViewVideo;
 import me.gzj.elephant.net.SiteService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -124,7 +126,7 @@ public class ElephantService {
             // 下载视频
             String downloadUrl = viewVideo.getDownloadUrl();
             if (StringUtils.isEmpty(downloadUrl)) {
-                logger.warn("Video download url empty");
+                logger.warn("Video download url empty. viewkey:{}", viewkey);
                 return ServiceResult.createFailResult();
             }
             String filename = String.format("%s_%s_%s.mp4", DateTimeUtil.format(viewVideo.getAdded(), "yyyyMMdd"),
@@ -140,10 +142,12 @@ public class ElephantService {
                     return ServiceResult.createSuccessResult();
                 } else {
                     logger.info("Downlaod video fail. viewkey:{}, filename:{}, filesize:{}", viewkey, filename, filesize);
+                    FileUtils.forceDelete(new File(fullFilename));
                     return ServiceResult.createFailResult();
                 }
             } else {
                 logger.warn("Download video fail. viewkey:{}", viewkey);
+                FileUtils.forceDelete(new File(fullFilename));
                 return ServiceResult.createFailResult();
             }
         } catch (Exception ex) {

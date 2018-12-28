@@ -17,13 +17,13 @@ public class ElephantApplication {
     public static void main(String[] args) {
         try {
             ConfigurableApplicationContext context = SpringApplication.run(ElephantApplication.class, args);
-            ElephantService elephantService = context.getBean(ElephantService.class);
 
             if (args.length < 1) {
                 System.out.println("Please run with args.");
             } else {
+                ElephantService elephantService = context.getBean(ElephantService.class);
                 String command = args[0];
-                ServiceResult result = null;
+                ServiceResult result;
                 switch (command) {
                     case "update":
                         result = elephantService.updateAllArchiveVideo();

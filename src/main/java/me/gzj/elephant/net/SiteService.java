@@ -78,7 +78,8 @@ public class SiteService {
             try {
                 response = call.execute();
             } catch (Exception ex) {
-                // 异常时重试
+                // 异常时等待1秒重试
+                Thread.sleep(1000);
                 response = call.clone().execute();
             }
             if (!response.isSuccessful()) {
@@ -159,7 +160,8 @@ public class SiteService {
             try {
                 response = call.execute();
             } catch (Exception ex) {
-                // 异常时重试
+                // 异常时等待1秒重试
+                Thread.sleep(1000);
                 response = call.clone().execute();
             }
             if (!response.isSuccessful()) {

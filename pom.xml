@@ -101,6 +101,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>elephant</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

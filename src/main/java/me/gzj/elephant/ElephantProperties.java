@@ -36,13 +36,37 @@ public class ElephantProperties {
     @Data
     public static class Header {
         /**
-         * User-Agent
+         * Accept
          */
-        private String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
+        private String accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+        /**
+         * Accept-Encoding
+         */
+        private String acceptEncoding = "gzip, deflate";
         /**
          * Accept-Language
          */
         private String acceptLanguage = "zh-CN,zh;q=0.9";
+        /**
+         * Cache-Control
+         */
+        private String cacheControl = "max-age=0";
+        /**
+         * Cookie
+         */
+        private String cookie = "";
+        /**
+         * Proxy-Connection
+         */
+        private String proxyConnection = "keep-alive";
+        /**
+         * Upgrade-Insecure-Requests
+         */
+        private String upgradeInsecureRequests = "1";
+        /**
+         * User-Agent
+         */
+        private String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
     }
 
     /**

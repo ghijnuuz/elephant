@@ -24,8 +24,14 @@ public class HeaderInterceptor implements Interceptor {
     @Override
     public Response intercept(Interceptor.Chain chain) throws IOException {
         Request request = chain.request().newBuilder()
-                .removeHeader("User-Agent").header("User-Agent", properties.getHeader().getUserAgent())
+                .removeHeader("Accept").header("Accept", properties.getHeader().getAccept())
+                .removeHeader("Accept-Encoding").header("Accept-Encoding", properties.getHeader().getAcceptEncoding())
                 .removeHeader("Accept-Language").header("Accept-Language", properties.getHeader().getAcceptLanguage())
+                .removeHeader("Cache-Control").header("Cache-Control", properties.getHeader().getCacheControl())
+                .removeHeader("Cookie").header("Cookie", properties.getHeader().getCookie())
+                .removeHeader("Proxy-Connection").header("Proxy-Connection", properties.getHeader().getProxyConnection())
+                .removeHeader("Upgrade-Insecure-Requests").header("Upgrade-Insecure-Requests", properties.getHeader().getUpgradeInsecureRequests())
+                .removeHeader("User-Agent").header("User-Agent", properties.getHeader().getUserAgent())
                 .build();
         return chain.proceed(request);
     }

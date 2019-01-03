@@ -42,7 +42,7 @@ public class ElephantProperties {
         /**
          * Accept-Encoding
          */
-        private String acceptEncoding = "gzip, deflate";
+        private String acceptEncoding = "deflate";
         /**
          * Accept-Language
          */

@@ -2,6 +2,7 @@ package me.gzj.elephant.net;
 
 import me.gzj.core.common.ServiceResult;
 import me.gzj.core.util.DateTimeUtil;
+import me.gzj.core.util.JsonUtil;
 import me.gzj.elephant.ElephantProperties;
 import me.gzj.elephant.model.BaseVideo;
 import me.gzj.elephant.model.CodeConst;
@@ -138,6 +139,8 @@ public class SiteService {
                 baseVideoList.add(baseVideo);
             });
 
+            logger.debug("Get video list. page:{}, video count:{}, video list:{}",
+                    page, baseVideoList.size(), JsonUtil.writeValueAsString(baseVideoList));
             return ServiceResult.createSuccessResult(baseVideoList);
         } catch (Exception ex) {
             logger.error("page:{}", page, ex);
@@ -220,6 +223,7 @@ public class SiteService {
                 }
             }
 
+            logger.debug("Get view video. viewkey:{}, viewVideo:{}", viewkey, JsonUtil.writeValueAsString(viewVideo));
             return ServiceResult.createSuccessResult(viewVideo);
         } catch (Exception ex) {
             logger.error("viewkey:{}", viewkey, ex);
@@ -250,6 +254,7 @@ public class SiteService {
                 byteCount = IOUtils.copyLarge(response.body().byteStream(), output);
             }
 
+            logger.debug("Download url:{}, filename:{}, byte count:{}", url, filename, byteCount);
             return ServiceResult.createSuccessResult(byteCount);
         } catch (Exception ex) {
             logger.error("url:{}, filename:{}", url, filename, ex);

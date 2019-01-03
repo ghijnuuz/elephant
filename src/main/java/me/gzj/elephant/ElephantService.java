@@ -60,7 +60,6 @@ public class ElephantService {
 
                 int pageVideoCount = baseVideoListResult.getData().size();
                 totalVideoCount += pageVideoCount;
-                logger.debug("Get page:{} video count:{}", page, pageVideoCount);
 
                 for (BaseVideo baseVideo : baseVideoListResult.getData()) {
                     String viewkey = baseVideo.getViewkey();
@@ -237,7 +236,12 @@ public class ElephantService {
             while (canDownload) {
                 ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(page);
                 if (baseVideoListResult.isSuccess()) {
-                    for (BaseVideo baseVideo : baseVideoListResult.getData()) {
+                    List<BaseVideo> baseVideoList = baseVideoListResult.getData();
+                    if (CollectionUtils.isEmpty(baseVideoList)) {
+                        canDownload = false;
+                        continue;
+                    }
+                    for (BaseVideo baseVideo : baseVideoList) {
                         String viewkey = baseVideo.getViewkey();
                         ServiceResult downloadResult = downloadVideo(viewkey);
                         if (downloadResult.isSuccess()) {

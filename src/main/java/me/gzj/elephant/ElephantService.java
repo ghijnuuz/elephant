@@ -6,6 +6,7 @@ import me.gzj.core.util.JsonUtil;
 import me.gzj.elephant.mapper.VideoMapper;
 import me.gzj.elephant.model.ArchiveVideo;
 import me.gzj.elephant.model.BaseVideo;
+import me.gzj.elephant.model.CodeConst;
 import me.gzj.elephant.model.ViewVideo;
 import me.gzj.elephant.net.SiteService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -108,26 +109,35 @@ public class ElephantService {
             logger.info("Start download video. viewkey:{}", viewkey);
             ServiceResult<ViewVideo> viewVideoResult = siteService.getViewVideo(viewkey);
             if (!viewVideoResult.isSuccess()) {
-                if (viewVideoResult.getCode() == -1000) {
+                if (viewVideoResult.getCode() == CodeConst.VIDEO_NOT_EXIST) {
                     // 视频不存在
                     videoMapper.updateVideoStatus(viewkey, 1);
-                    logger.info("Video miss. viewkey:{}", viewkey);
+                    logger.info("Video not exist. viewkey:{}", viewkey);
+                    return ServiceResult.create(viewVideoResult.getCode(), viewVideoResult.getMessage());
                 } else {
                     logger.warn("View video fail. viewkey:{}, result:{}", viewkey, JsonUtil.writeValueAsString(viewVideoResult));
+                    return ServiceResult.createFailResult();
                 }
-                return ServiceResult.createFailResult();
             }
 
             ViewVideo viewVideo = viewVideoResult.getData();
 
             // 更新存档视频
-            videoMapper.updateVideo(viewVideo);
+            ArchiveVideo archiveVideo = videoMapper.getVideo(viewkey);
+            if (archiveVideo != null) {
+                videoMapper.updateVideo(viewVideo);
+                if (archiveVideo.getDownload() == 1) {
+                    return ServiceResult.create(CodeConst.VIDEO_ALREADY_DOWNLOAD, "视频已下载");
+                }
+            } else {
+                videoMapper.addVideo(viewVideo);
+            }
 
             // 下载视频
             String downloadUrl = viewVideo.getDownloadUrl();
             if (StringUtils.isEmpty(downloadUrl)) {
-                logger.warn("Video download url empty. viewkey:{}", viewkey);
-                return ServiceResult.createFailResult();
+                logger.warn("Video download restricted. viewkey:{}", viewkey);
+                return ServiceResult.create(CodeConst.DOWNLOAD_RESTRICTED, "下载被限制");
             }
             String filename = String.format("%s_%s_%s.mp4", DateTimeUtil.format(viewVideo.getAdded(), "yyyyMMdd"),
                     viewVideo.getViewkey(), viewVideo.getTitle());
@@ -158,18 +168,18 @@ public class ElephantService {
 
     /**
      * 下载存档视频
-     * @param type
+     * @param order
      * @return
      */
-    public ServiceResult<Integer> downloadArchiveVideo(String type) {
-        logger.info("Start download archive video. type:{}", type);
+    public ServiceResult<Integer> downloadArchiveVideo(String order) {
+        logger.info("Start download archive video. order:{}", order);
         int downloadCount = 0;
         try {
             boolean canDownload = true;
             int size = 20;
             while (canDownload) {
                 List<ArchiveVideo> archiveVideoList = null;
-                switch (type) {
+                switch (order) {
                     case "views":
                         archiveVideoList = videoMapper.getNormalNotDownloadVideoListOrderByViews(size);
                         break;
@@ -186,6 +196,7 @@ public class ElephantService {
                         archiveVideoList = videoMapper.getNormalNotDownloadVideoListOrderByCreateTime(size);
                         break;
                     default:
+                        return ServiceResult.createParameterErrorResult();
                 }
                 if (CollectionUtils.isNotEmpty(archiveVideoList)) {
                     for (ArchiveVideo archiveVideo : archiveVideoList) {
@@ -194,8 +205,11 @@ public class ElephantService {
                         if (downloadResult.isSuccess()) {
                             downloadCount++;
                         } else {
-                            canDownload = false;
-                            break;
+                            if (downloadResult.getCode() != CodeConst.VIDEO_NOT_EXIST &&
+                                    downloadResult.getCode() != CodeConst.VIDEO_ALREADY_DOWNLOAD) {
+                                canDownload = false;
+                                break;
+                            }
                         }
                     }
                 }
@@ -203,9 +217,48 @@ public class ElephantService {
 
             return ServiceResult.createSuccessResult(downloadCount);
         } catch (Exception ex) {
-            logger.error("type:{}", type, ex);
+            logger.error("order:{}", order, ex);
         } finally {
             logger.info("Download archive video. Download count:{}", downloadCount);
+        }
+        return ServiceResult.createFailResult();
+    }
+
+    /**
+     * 下载在线视频
+     * @return
+     */
+    public ServiceResult<Integer> downloadOnlineVideo() {
+        logger.info("Start download online video.");
+        int downloadCount = 0;
+        try {
+            boolean canDownload = true;
+            int page = 1;
+            while (canDownload) {
+                ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(page);
+                if (baseVideoListResult.isSuccess()) {
+                    for (BaseVideo baseVideo : baseVideoListResult.getData()) {
+                        String viewkey = baseVideo.getViewkey();
+                        ServiceResult downloadResult = downloadVideo(viewkey);
+                        if (downloadResult.isSuccess()) {
+                            downloadCount++;
+                        } else {
+                            if (downloadResult.getCode() != CodeConst.VIDEO_NOT_EXIST &&
+                                    downloadResult.getCode() != CodeConst.VIDEO_ALREADY_DOWNLOAD) {
+                                canDownload = false;
+                                break;
+                            }
+                        }
+                    }
+                    page++;
+                }
+            }
+
+            return ServiceResult.createSuccessResult(downloadCount);
+        } catch (Exception ex) {
+            logger.error("error", ex);
+        } finally {
+            logger.info("Download online video. Download count:{}", downloadCount);
         }
         return ServiceResult.createFailResult();
     }

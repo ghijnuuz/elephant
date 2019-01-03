@@ -4,6 +4,7 @@ import me.gzj.core.common.ServiceResult;
 import me.gzj.core.util.DateTimeUtil;
 import me.gzj.elephant.ElephantProperties;
 import me.gzj.elephant.model.BaseVideo;
+import me.gzj.elephant.model.CodeConst;
 import me.gzj.elephant.model.ViewVideo;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -172,7 +173,7 @@ public class SiteService {
             String path = currentHttpUrl.encodedPath();
             String type = currentHttpUrl.queryParameter("type");
             if (StringUtils.equals(path, "/error.php") && StringUtils.equals(type, "video_missing")) {
-                return ServiceResult.create(-1000, "视频不存在");
+                return ServiceResult.create(CodeConst.VIDEO_NOT_EXIST, "视频不存在");
             }
 
             ResponseBody body = response.body();

@@ -2,6 +2,7 @@ package me.gzj.elephant.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
  * @author ghijnuuz
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ArchiveVideo extends BaseVideo {
@@ -33,9 +35,6 @@ public class ArchiveVideo extends BaseVideo {
      * 更新时间
      */
     private LocalDateTime updateTime;
-
-    public ArchiveVideo() {
-    }
 
     public ArchiveVideo(BaseVideo baseVideo) {
         this.setViewkey(baseVideo.getViewkey());

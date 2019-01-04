@@ -2,7 +2,7 @@ package me.gzj.elephant.model;
 
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author ghijnuuz
@@ -24,7 +24,7 @@ public class BaseVideo {
     /**
      * 添加时间
      */
-    private LocalDate added = LocalDate.of(1000, 1, 1);
+    private LocalDateTime added = CommonConst.MYSQL_MIN_LOCAL_DATE_TIME;
     /**
      * 作者
      */
@@ -32,17 +32,17 @@ public class BaseVideo {
     /**
      * 查看
      */
-    private int views;
+    private int views = -1;
     /**
      * 收藏
      */
-    private int favorites;
+    private int favorites = -1;
     /**
      * 留言
      */
-    private int comments;
+    private int comments = -1;
     /**
      * 积分
      */
-    private int point;
+    private int point = -1;
 }

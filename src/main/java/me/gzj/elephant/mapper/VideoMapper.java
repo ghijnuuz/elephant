@@ -18,6 +18,9 @@ public interface VideoMapper {
             "(#{viewkey},#{title},#{runtime},#{added},#{from},#{views},#{favorites},#{comments},#{point})")
     int addVideo(BaseVideo video);
 
+    @Delete("delete from `video` where `viewkey`=#{viewkey}")
+    int deleteVideo(@Param("viewkey") String viewkey);
+
     @Update("update `video` " +
             "set `title`=#{title},`runtime`=#{runtime},`added`=#{added},`from`=#{from},`views`=#{views},`favorites`=#{favorites},`comments`=#{comments},`point`=#{point} " +
             "where `viewkey`=#{viewkey}")

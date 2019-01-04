@@ -1,5 +1,6 @@
 package me.gzj.elephant.net;
 
+import lombok.extern.slf4j.Slf4j;
 import me.gzj.core.common.ServiceResult;
 import me.gzj.core.util.DateTimeUtil;
 import me.gzj.core.util.JsonUtil;
@@ -18,8 +19,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
@@ -30,15 +29,17 @@ import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author ghijnuuz
  */
+@Slf4j
 @Service
 public class SiteService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final SitePage sitePage;
 
     @Autowired
@@ -126,24 +127,24 @@ public class SiteService {
                     if (StringUtils.isNotEmpty(from)) {
                         baseVideo.setFrom(from);
                     }
-                    int views = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(3).nextSibling().toString())));
+                    int views = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(3).nextSibling().toString())), -1);
                     baseVideo.setViews(views);
-                    int favorites = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(4).nextSibling().toString()).trim()));
+                    int favorites = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(4).nextSibling().toString()).trim()), -1);
                     baseVideo.setFavorites(favorites);
-                    int comments = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(5).nextSibling().toString()).trim()));
+                    int comments = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(5).nextSibling().toString()).trim()), -1);
                     baseVideo.setComments(comments);
-                    int point = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(6).nextSibling().toString()).trim()));
+                    int point = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(6).nextSibling().toString()).trim()), -1);
                     baseVideo.setPoint(point);
                 }
 
                 baseVideoList.add(baseVideo);
             });
 
-            logger.debug("Get video list. page:{}, video count:{}, video list:{}",
+            log.debug("Get video list. page:{}, video count:{}, video list:{}",
                     page, baseVideoList.size(), JsonUtil.writeValueAsString(baseVideoList));
             return ServiceResult.createSuccessResult(baseVideoList);
         } catch (Exception ex) {
-            logger.error("page:{}", page, ex);
+            log.error("page:{}", page, ex);
         }
         return ServiceResult.createFailResult();
     }
@@ -199,20 +200,22 @@ public class SiteService {
                 if (StringUtils.isNotEmpty(runtime)) {
                     viewVideo.setRuntime(runtime);
                 }
-                int views = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(1).nextSibling().toString())));
+                int views = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(1).nextSibling().toString())), -1);
                 viewVideo.setViews(views);
-                int comments = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(2).nextSibling().toString())));
+                int comments = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(2).nextSibling().toString())), -1);
                 viewVideo.setComments(comments);
-                int favorites = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(3).nextSibling().toString())));
+                int favorites = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(3).nextSibling().toString())), -1);
                 viewVideo.setFavorites(favorites);
-                int point = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(4).nextSibling().toString())));
+                int point = NumberUtils.toInt(StringUtils.normalizeSpace(StringEscapeUtils.unescapeHtml4(elementsInfo.get(4).nextSibling().toString())), -1);
                 viewVideo.setPoint(point);
             }
 
-            Elements elementsDay = document.select("#videodetails-content .title");
-            if (elementsDay.size() > 2) {
-                LocalDate added = DateTimeUtil.toLocalDate(elementsDay.get(1).text().trim(), "yyyy-MM-dd");
-                viewVideo.setAdded(added);
+            Elements elementsDetail = document.select("#videodetails-content .title");
+            if (elementsDetail.size() > 2) {
+                LocalDate added = DateTimeUtil.toLocalDate(elementsDetail.get(1).text().trim(), "yyyy-MM-dd");
+                viewVideo.setAdded(LocalDateTime.of(added, LocalTime.MIDNIGHT));
+
+                viewVideo.setFrom(elementsDetail.get(2).text().trim());
             }
 
             Elements elementsVideo = document.select("video source");
@@ -223,10 +226,10 @@ public class SiteService {
                 }
             }
 
-            logger.debug("Get view video. viewkey:{}, viewVideo:{}", viewkey, JsonUtil.writeValueAsString(viewVideo));
+            log.debug("Get view video. viewkey:{}, viewVideo:{}", viewkey, JsonUtil.writeValueAsString(viewVideo));
             return ServiceResult.createSuccessResult(viewVideo);
         } catch (Exception ex) {
-            logger.error("viewkey:{}", viewkey, ex);
+            log.error("viewkey:{}", viewkey, ex);
         }
         return ServiceResult.createFailResult();
     }
@@ -254,10 +257,10 @@ public class SiteService {
                 byteCount = IOUtils.copyLarge(response.body().byteStream(), output);
             }
 
-            logger.debug("Download url:{}, filename:{}, byte count:{}", url, filename, byteCount);
+            log.debug("Download url:{}, filename:{}, byte count:{}", url, filename, byteCount);
             return ServiceResult.createSuccessResult(byteCount);
         } catch (Exception ex) {
-            logger.error("url:{}, filename:{}", url, filename, ex);
+            log.error("url:{}, filename:{}", url, filename, ex);
         }
         return ServiceResult.createFailResult();
     }

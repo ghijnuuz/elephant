@@ -1,5 +1,6 @@
 package me.gzj.elephant;
 
+import lombok.extern.slf4j.Slf4j;
 import me.gzj.core.common.ServiceResult;
 import me.gzj.core.util.DateTimeUtil;
 import me.gzj.core.util.JsonUtil;
@@ -13,8 +14,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +23,9 @@ import java.util.List;
 /**
  * @author ghijnuuz
  */
+@Slf4j
 @Service
 public class ElephantService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ElephantProperties properties;
     private final SiteService siteService;
     private final VideoMapper videoMapper;
@@ -43,7 +42,7 @@ public class ElephantService {
      * @return
      */
     public ServiceResult<Triple<Integer, Integer, Integer>> updateAllArchiveVideo() {
-        logger.info("Start update all archive video.");
+        log.info("Start update all archive video.");
         int totalVideoCount = 0;
         int newVideoCount = 0;
         int updateVideoCount = 0;
@@ -53,7 +52,7 @@ public class ElephantService {
             while (hasNextPage) {
                 ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(page);
                 if (!baseVideoListResult.isSuccess()) {
-                    logger.warn("Get base video list fail. page:{}, result:{}", page, JsonUtil.writeValueAsString(baseVideoListResult));
+                    log.warn("Get base video list fail. page:{}, result:{}", page, JsonUtil.writeValueAsString(baseVideoListResult));
                     hasNextPage = false;
                     break;
                 }
@@ -70,14 +69,14 @@ public class ElephantService {
                         if (updateResult > 0) {
                             updateVideoCount++;
                         } else {
-                            logger.warn("Update no added video fail. baseVideo:{}", JsonUtil.writeValueAsString(baseVideo));
+                            log.warn("Update no added video fail. baseVideo:{}", JsonUtil.writeValueAsString(baseVideo));
                         }
                     } else {
                         int addResult = videoMapper.addVideo(baseVideo);
                         if (addResult > 0) {
                             newVideoCount++;
                         } else {
-                            logger.warn("Add video fail. baseVideo:{}", JsonUtil.writeValueAsString(baseVideo));
+                            log.warn("Add video fail. baseVideo:{}", JsonUtil.writeValueAsString(baseVideo));
                         }
                     }
                 }
@@ -90,9 +89,9 @@ public class ElephantService {
             }
             return ServiceResult.createSuccessResult(Triple.of(totalVideoCount, newVideoCount, updateVideoCount));
         } catch (Exception ex) {
-            logger.error("updateAllArchiveVideo error", ex);
+            log.error("updateAllArchiveVideo error", ex);
         } finally {
-            logger.info("Update all archive video. Total count:{}, new count:{}, update count:{}",
+            log.info("Update all archive video. Total count:{}, new count:{}, update count:{}",
                     totalVideoCount, newVideoCount, updateVideoCount);
         }
         return ServiceResult.createFailResult();
@@ -105,16 +104,16 @@ public class ElephantService {
      */
     public ServiceResult downloadVideo(String viewkey) {
         try {
-            logger.info("Start download video. viewkey:{}", viewkey);
+            log.info("Start download video. viewkey:{}", viewkey);
             ServiceResult<ViewVideo> viewVideoResult = siteService.getViewVideo(viewkey);
             if (!viewVideoResult.isSuccess()) {
                 if (viewVideoResult.getCode() == CodeConst.VIDEO_NOT_EXIST) {
                     // 视频不存在
                     videoMapper.updateVideoStatus(viewkey, 1);
-                    logger.info("Video not exist. viewkey:{}", viewkey);
+                    log.info("Video not exist. viewkey:{}", viewkey);
                     return ServiceResult.create(viewVideoResult.getCode(), viewVideoResult.getMessage());
                 } else {
-                    logger.warn("View video fail. viewkey:{}, result:{}", viewkey, JsonUtil.writeValueAsString(viewVideoResult));
+                    log.warn("View video fail. viewkey:{}, result:{}", viewkey, JsonUtil.writeValueAsString(viewVideoResult));
                     return ServiceResult.createFailResult();
                 }
             }
@@ -135,7 +134,7 @@ public class ElephantService {
             // 下载视频
             String downloadUrl = viewVideo.getDownloadUrl();
             if (StringUtils.isEmpty(downloadUrl)) {
-                logger.warn("Video download restricted. viewkey:{}", viewkey);
+                log.warn("Video download restricted. viewkey:{}", viewkey);
                 return ServiceResult.create(CodeConst.DOWNLOAD_RESTRICTED, "下载被限制");
             }
             String filename = String.format("%s_%s_%s.mp4", DateTimeUtil.format(viewVideo.getAdded(), "yyyyMMdd"),
@@ -146,21 +145,21 @@ public class ElephantService {
                 long filesize = downloadResult.getData();
                 if (filesize >= 100 * 1024) {
                     // 正常视频应该大于100KB
-                    logger.info("Downlaod video success. viewkey:{}, filename:{}, filesize:{}", viewkey, filename, filesize);
+                    log.info("Downlaod video success. viewkey:{}, filename:{}, filesize:{}", viewkey, filename, filesize);
                     videoMapper.updateVideoDownload(viewkey, 1);
                     return ServiceResult.createSuccessResult();
                 } else {
-                    logger.info("Downlaod video fail. viewkey:{}, filename:{}, filesize:{}", viewkey, filename, filesize);
+                    log.info("Downlaod video fail. viewkey:{}, filename:{}, filesize:{}", viewkey, filename, filesize);
                     FileUtils.forceDelete(new File(fullFilename));
                     return ServiceResult.createFailResult();
                 }
             } else {
-                logger.warn("Download video fail. viewkey:{}", viewkey);
+                log.warn("Download video fail. viewkey:{}", viewkey);
                 FileUtils.forceDelete(new File(fullFilename));
                 return ServiceResult.createFailResult();
             }
         } catch (Exception ex) {
-            logger.error("viewkey:{}", viewkey, ex);
+            log.error("viewkey:{}", viewkey, ex);
         }
         return ServiceResult.createFailResult();
     }
@@ -171,7 +170,7 @@ public class ElephantService {
      * @return
      */
     public ServiceResult<Integer> downloadArchiveVideo(String order) {
-        logger.info("Start download archive video. order:{}", order);
+        log.info("Start download archive video. order:{}", order);
         int downloadCount = 0;
         try {
             boolean canDownload = true;
@@ -216,9 +215,9 @@ public class ElephantService {
 
             return ServiceResult.createSuccessResult(downloadCount);
         } catch (Exception ex) {
-            logger.error("order:{}", order, ex);
+            log.error("order:{}", order, ex);
         } finally {
-            logger.info("Download archive video. Download count:{}", downloadCount);
+            log.info("Download archive video. Download count:{}", downloadCount);
         }
         return ServiceResult.createFailResult();
     }
@@ -228,7 +227,7 @@ public class ElephantService {
      * @return
      */
     public ServiceResult<Integer> downloadOnlineVideo() {
-        logger.info("Start download online video.");
+        log.info("Start download online video.");
         int downloadCount = 0;
         try {
             boolean canDownload = true;
@@ -260,9 +259,9 @@ public class ElephantService {
 
             return ServiceResult.createSuccessResult(downloadCount);
         } catch (Exception ex) {
-            logger.error("error", ex);
+            log.error("error", ex);
         } finally {
-            logger.info("Download online video. Download count:{}", downloadCount);
+            log.info("Download online video. Download count:{}", downloadCount);
         }
         return ServiceResult.createFailResult();
     }

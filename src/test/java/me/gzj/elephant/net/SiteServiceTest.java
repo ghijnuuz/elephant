@@ -6,6 +6,7 @@ import me.gzj.elephant.model.CodeConst;
 import me.gzj.elephant.TestUtil;
 import me.gzj.elephant.model.ViewVideo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -28,13 +29,25 @@ public class SiteServiceTest {
     private SiteService siteService;
 
     @Test
-    public void getBaseVideoList() {
-        ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(1);
+    public void getBaseVideoList_FirstPage() {
+        ServiceResult<Pair<List<BaseVideo>, Integer>> baseVideoListResult = siteService.getBaseVideoList(1);
         Assert.assertTrue(baseVideoListResult.isSuccess());
-        List<BaseVideo> baseVideoList = baseVideoListResult.getData();
+        Pair<List<BaseVideo>, Integer> pair = baseVideoListResult.getData();
+        List<BaseVideo> baseVideoList = pair.getLeft();
         Assert.assertTrue(CollectionUtils.isNotEmpty(baseVideoList));
         BaseVideo baseVideo = baseVideoList.get(0);
         TestUtil.assertBaseVideo(baseVideo);
+        int pageCount = pair.getRight();
+        Assert.assertTrue(pageCount > 0);
+    }
+
+    @Test
+    public void getBaseVideoList_LastPage() {
+        ServiceResult<Pair<List<BaseVideo>, Integer>> baseVideoListResult = siteService.getBaseVideoList(100000000);
+        Assert.assertTrue(baseVideoListResult.isSuccess());
+        Pair<List<BaseVideo>, Integer> pair = baseVideoListResult.getData();
+        int pageCount = pair.getRight();
+        Assert.assertTrue(pageCount > 0);
     }
 
     @Test

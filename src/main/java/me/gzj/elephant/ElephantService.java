@@ -13,6 +13,7 @@ import me.gzj.elephant.net.SiteService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,17 +51,26 @@ public class ElephantService {
             int page = 1;
             boolean hasNextPage = true;
             while (hasNextPage) {
-                ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(page);
+                ServiceResult<Pair<List<BaseVideo>, Integer>> baseVideoListResult = siteService.getBaseVideoList(page);
                 if (!baseVideoListResult.isSuccess()) {
                     log.warn("Get base video list fail. page:{}, result:{}", page, JsonUtil.writeValueAsString(baseVideoListResult));
-                    hasNextPage = false;
                     break;
                 }
 
-                int pageVideoCount = baseVideoListResult.getData().size();
+                Pair<List<BaseVideo>, Integer> pair = baseVideoListResult.getData();
+                List<BaseVideo> baseVideoList = pair.getLeft();
+                int pageCount = pair.getRight();
+
+                int pageVideoCount = baseVideoList.size();
                 totalVideoCount += pageVideoCount;
 
-                for (BaseVideo baseVideo : baseVideoListResult.getData()) {
+                if (page >= pageCount) {
+                    hasNextPage = false;
+                } else {
+                    page++;
+                }
+
+                for (BaseVideo baseVideo : baseVideoList) {
                     String viewkey = baseVideo.getViewkey();
 
                     ArchiveVideo archiveVideo = videoMapper.getVideo(viewkey);
@@ -79,12 +89,6 @@ public class ElephantService {
                             log.warn("Add video fail. baseVideo:{}", JsonUtil.writeValueAsString(baseVideo));
                         }
                     }
-                }
-
-                if (pageVideoCount > 0) {
-                    page++;
-                } else {
-                    hasNextPage = false;
                 }
             }
             return ServiceResult.createSuccessResult(Triple.of(totalVideoCount, newVideoCount, updateVideoCount));
@@ -233,9 +237,9 @@ public class ElephantService {
             boolean canDownload = true;
             int page = 1;
             while (canDownload) {
-                ServiceResult<List<BaseVideo>> baseVideoListResult = siteService.getBaseVideoList(page);
+                ServiceResult<Pair<List<BaseVideo>, Integer>> baseVideoListResult = siteService.getBaseVideoList(page);
                 if (baseVideoListResult.isSuccess()) {
-                    List<BaseVideo> baseVideoList = baseVideoListResult.getData();
+                    List<BaseVideo> baseVideoList = baseVideoListResult.getData().getLeft();
                     if (CollectionUtils.isEmpty(baseVideoList)) {
                         canDownload = false;
                         continue;

@@ -14,6 +14,7 @@ import okhttp3.ResponseBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -70,7 +71,7 @@ public class SiteService {
      * @param page
      * @return
      */
-    public ServiceResult<List<BaseVideo>> getBaseVideoList(int page) {
+    public ServiceResult<Pair<List<BaseVideo>, Integer>> getBaseVideoList(int page) {
         if (page <= 0) {
             return ServiceResult.createParameterErrorResult();
         }
@@ -93,6 +94,23 @@ public class SiteService {
             Document document = Jsoup.parse(body.string());
 
             List<BaseVideo> baseVideoList = new ArrayList<>();
+            int pageCount = 0;
+
+            Elements elementsPageA = document.select("#paging form a");
+            for (Element element : elementsPageA) {
+                int pageValue = NumberUtils.toInt(element.text().trim());
+                if (pageValue > pageCount) {
+                    pageCount = pageValue;
+                }
+            }
+            Elements elementsPageSpan = document.select("#paging form span");
+            for (Element element : elementsPageSpan) {
+                int pageValue = NumberUtils.toInt(element.text().trim());
+                if (pageValue > pageCount) {
+                    pageCount = pageValue;
+                }
+            }
+
             Elements elementsVideo = document.select("#videobox .listchannel");
             elementsVideo.forEach(element -> {
                 BaseVideo baseVideo = new BaseVideo();
@@ -140,9 +158,9 @@ public class SiteService {
                 baseVideoList.add(baseVideo);
             });
 
-            log.debug("Get video list. page:{}, video count:{}, video list:{}",
-                    page, baseVideoList.size(), JsonUtil.writeValueAsString(baseVideoList));
-            return ServiceResult.createSuccessResult(baseVideoList);
+            log.debug("Get video list. page:{}, pageCount:{}, video count:{}, video list:{}",
+                    page, pageCount, baseVideoList.size(), JsonUtil.writeValueAsString(baseVideoList));
+            return ServiceResult.createSuccessResult(Pair.of(baseVideoList, pageCount));
         } catch (Exception ex) {
             log.error("page:{}", page, ex);
         }

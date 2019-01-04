@@ -7,6 +7,14 @@ elephant源自《蜡笔小新》，帮助下载网站的视频。
 * Java 8
 * MySQL 5.7
 
+## 初始化数据库
+
+使用`doc`目录下的`create_database.sql`文件初始化数据库
+
+```shell
+mysql -h localhost -u username -p < create_database.sql
+```
+
 ## 配置
 
 在`elephant.jar`同目录中创建`application.properties`文件，按照如下示范配置：

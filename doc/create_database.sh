@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-mysql -h 127.0.0.1 -u root -p < create_database.sql
+mysql -h localhost -u root -p < create_database.sql

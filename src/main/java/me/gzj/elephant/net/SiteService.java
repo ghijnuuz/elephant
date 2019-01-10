@@ -29,9 +29,7 @@ import retrofit2.Retrofit;
 import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +39,12 @@ import java.util.List;
 @Slf4j
 @Service
 public class SiteService {
+    private final ElephantProperties properties;
     private final SitePage sitePage;
 
     @Autowired
-    public SiteService(ElephantProperties properties, HeaderInterceptor headerInterceptor) {
+    public SiteService(ElephantProperties properties, HeaderInterceptor headerInterceptor, ElephantProperties properties1) {
+        this.properties = properties1;
         Proxy proxy = null;
         if (properties.getProxy().getType() != Proxy.Type.DIRECT) {
             InetSocketAddress socketAddress = new InetSocketAddress(properties.getProxy().getHostname(), properties.getProxy().getPort());
@@ -230,8 +230,12 @@ public class SiteService {
 
             Elements elementsDetail = document.select("#videodetails-content .title");
             if (elementsDetail.size() > 2) {
-                LocalDate added = DateTimeUtil.toLocalDate(elementsDetail.get(1).text().trim(), "yyyy-MM-dd");
-                viewVideo.setAdded(LocalDateTime.of(added, LocalTime.MIDNIGHT));
+                LocalDate siteAddedDate = DateTimeUtil.toLocalDate(elementsDetail.get(1).text().trim(), "yyyy-MM-dd");
+                LocalDateTime siteAddedDateTime = LocalDateTime.of(siteAddedDate, LocalTime.MIDNIGHT);
+                ZonedDateTime zonedAdded = ZonedDateTime.of(siteAddedDateTime, ZoneId.of(properties.getSite().getTimeZoneID()));
+                zonedAdded = zonedAdded.withZoneSameInstant(ZoneId.systemDefault());
+                LocalDateTime added = zonedAdded.toLocalDateTime();
+                viewVideo.setAdded(added);
 
                 viewVideo.setFrom(elementsDetail.get(2).text().trim());
             }

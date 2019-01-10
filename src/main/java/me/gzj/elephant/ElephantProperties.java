@@ -26,6 +26,10 @@ public class ElephantProperties {
          * http[s]://www.example.com/
          */
         private String baseUrl = "";
+        /**
+         * 时区ID
+         */
+        private String timeZoneID = "-5";
     }
 
     /**

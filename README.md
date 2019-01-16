@@ -21,7 +21,7 @@ mysql -h localhost -u username -p < create_database.sql
 
 ```properties
 # 数据库URL
-spring.datasource.url=jdbc:mysql://localhost/elephant?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true
+spring.datasource.url=jdbc:mysql://localhost/elephant?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
 # 数据库用户名
 spring.datasource.username=username
 # 数据库密码
@@ -29,6 +29,8 @@ spring.datasource.password=password
 
 # 站点基准URL
 elephant.site.base-url=http://example.com/
+# 时区ID
+elephant.site.time-zone-id=-5
 
 # 代理类型 direct http socks
 elephant.proxy.type=direct

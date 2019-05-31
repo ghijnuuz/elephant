@@ -1,10 +1,11 @@
 package me.gzj.elephant.net;
 
-import me.gzj.core.common.ServiceResult;
+import me.gzj.commons.core.model.ServiceResult;
 import me.gzj.elephant.TestUtil;
 import me.gzj.elephant.model.BaseVideo;
 import me.gzj.elephant.model.CodeConst;
 import me.gzj.elephant.model.ViewVideo;
+import me.gzj.elephant.service.SiteService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;

@@ -5,7 +5,7 @@
 
     <parent>
         <groupId>me.gzj</groupId>
-        <artifactId>gzj-parent</artifactId>
+        <artifactId>commons-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>me.gzj</groupId>
-            <artifactId>gzj-core</artifactId>
+            <artifactId>commons-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

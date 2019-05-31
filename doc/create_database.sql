@@ -5,7 +5,7 @@ CREATE TABLE `video` (
   `viewkey` VARCHAR(64) NOT NULL PRIMARY KEY comment 'viewkey',
   `title` VARCHAR(128) NOT NULL comment '标题',
   `runtime` VARCHAR(16) NOT NULL comment '时长',
-  `added` TIMESTAMP NOT NULL comment '添加时间',
+  `added` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' comment '添加时间',
   `from` VARCHAR(64) NOT NULL comment '作者',
   `views` INT NOT NULL comment '查看',
   `favorites` INT NOT NULL comment '收藏',

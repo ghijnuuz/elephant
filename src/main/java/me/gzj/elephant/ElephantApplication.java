@@ -1,7 +1,8 @@
 package me.gzj.elephant;
 
-import me.gzj.core.common.ServiceResult;
-import me.gzj.core.util.JsonUtil;
+import me.gzj.commons.core.model.ServiceResult;
+import me.gzj.commons.core.util.JsonUtil;
+import me.gzj.elephant.service.ElephantService;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;

@@ -2,6 +2,7 @@
 <configuration scan="true">
 
     <property scope="context" name="logPath" value="./log/" />
+    <property scope="context" name="logFilePrefix" value="elephant." />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -10,9 +11,9 @@
     </appender>
 
     <appender name="TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logPath}elephant.trace.log</file>
+        <file>${logPath}${logFilePrefix}trace.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}elephant.trace.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${logPath}${logFilePrefix}trace.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -29,9 +30,9 @@
     </appender>
 
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logPath}elephant.debug.log</file>
+        <file>${logPath}${logFilePrefix}debug.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}elephant.debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${logPath}${logFilePrefix}debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -48,9 +49,9 @@
     </appender>
 
     <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logPath}elephant.info.log</file>
+        <file>${logPath}${logFilePrefix}info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}elephant.info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${logPath}${logFilePrefix}info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -67,9 +68,9 @@
     </appender>
 
     <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logPath}elephant.warn.log</file>
+        <file>${logPath}${logFilePrefix}warn.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}elephant.warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${logPath}${logFilePrefix}warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -86,9 +87,9 @@
     </appender>
 
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logPath}elephant.error.log</file>
+        <file>${logPath}${logFilePrefix}error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}elephant.error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${logPath}${logFilePrefix}error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>200MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>

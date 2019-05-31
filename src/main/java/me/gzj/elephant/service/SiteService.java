@@ -1,13 +1,15 @@
-package me.gzj.elephant.net;
+package me.gzj.elephant.service;
 
 import lombok.extern.slf4j.Slf4j;
-import me.gzj.core.common.ServiceResult;
-import me.gzj.core.util.DateTimeUtil;
-import me.gzj.core.util.JsonUtil;
+import me.gzj.commons.core.model.ServiceResult;
+import me.gzj.commons.core.util.DateTimeUtil;
+import me.gzj.commons.core.util.JsonUtil;
 import me.gzj.elephant.ElephantProperties;
 import me.gzj.elephant.model.BaseVideo;
 import me.gzj.elephant.model.CodeConst;
 import me.gzj.elephant.model.ViewVideo;
+import me.gzj.elephant.net.HeaderInterceptor;
+import me.gzj.elephant.net.SitePage;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;

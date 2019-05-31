@@ -1,6 +1,6 @@
 package me.gzj.elephant.model;
 
-import me.gzj.core.util.DateTimeUtil;
+import me.gzj.commons.core.util.DateTimeUtil;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
